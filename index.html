@@ -1,0 +1,3382 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>SRS - Pathology Lab Management System (LIMS)</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        color: #1e293b;
+        line-height: 1.7;
+        background: #fff;
+      }
+
+      /* ─── PRINT STYLES ──────────────────── */
+      @media print {
+        .no-print {
+          display: none !important;
+        }
+        body {
+          font-size: 11pt;
+        }
+        .page-break {
+          page-break-before: always;
+        }
+        .cover {
+          min-height: auto;
+          padding: 60px 40px;
+        }
+        nav {
+          display: none;
+        }
+      }
+
+      /* ─── SIDEBAR NAV ────────────────────── */
+      nav.sidebar {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 280px;
+        height: 100vh;
+        background: #0f172a;
+        color: #94a3b8;
+        overflow-y: auto;
+        padding: 24px 0;
+        z-index: 100;
+      }
+
+      nav.sidebar .nav-title {
+        padding: 0 20px 20px;
+        font-size: 13px;
+        font-weight: 700;
+        color: #fff;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        border-bottom: 1px solid #1e293b;
+      }
+
+      nav.sidebar .nav-title small {
+        display: block;
+        font-size: 11px;
+        font-weight: 400;
+        color: #64748b;
+        text-transform: none;
+        letter-spacing: 0;
+        margin-top: 4px;
+      }
+
+      nav.sidebar a {
+        display: block;
+        padding: 8px 20px;
+        color: #94a3b8;
+        text-decoration: none;
+        font-size: 13px;
+        border-left: 3px solid transparent;
+        transition: all 0.2s;
+      }
+
+      nav.sidebar a:hover {
+        background: #1e293b;
+        color: #e2e8f0;
+        border-left-color: #0ea5e9;
+      }
+
+      nav.sidebar a.section-title {
+        color: #cbd5e1;
+        font-weight: 700;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-top: 16px;
+        padding-bottom: 4px;
+      }
+
+      nav.sidebar a.section-title:hover {
+        background: transparent;
+      }
+
+      /* ─── MAIN CONTENT ───────────────────── */
+      .main {
+        margin-left: 280px;
+        padding: 0;
+      }
+
+      /* ─── COVER PAGE ─────────────────────── */
+      .cover {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        padding: 80px 40px;
+        background: linear-gradient(135deg, #f8fafc, #f1f5f9);
+        border-bottom: 4px solid #0f766e;
+      }
+
+      .cover .doc-badge {
+        display: inline-block;
+        background: #0f766e;
+        color: #fff;
+        padding: 6px 20px;
+        border-radius: 4px;
+        font-size: 12px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        margin-bottom: 32px;
+      }
+
+      .cover h1 {
+        font-size: 40px;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 8px;
+        letter-spacing: -0.5px;
+      }
+
+      .cover .subtitle {
+        font-size: 20px;
+        color: #475569;
+        margin-bottom: 40px;
+      }
+
+      .cover-meta {
+        display: grid;
+        grid-template-columns: repeat(2, auto);
+        gap: 8px 40px;
+        text-align: left;
+        font-size: 14px;
+        background: #fff;
+        padding: 24px 32px;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+      }
+
+      .cover-meta dt {
+        color: #64748b;
+        font-weight: 600;
+      }
+
+      .cover-meta dd {
+        color: #0f172a;
+        font-weight: 500;
+      }
+
+      /* ─── SECTION ────────────────────────── */
+      .section {
+        padding: 48px 56px;
+        border-bottom: 1px solid #e2e8f0;
+      }
+
+      .section:last-child {
+        border-bottom: none;
+      }
+
+      .section-num {
+        display: inline-block;
+        background: #0f766e;
+        color: #fff;
+        width: 32px;
+        height: 32px;
+        border-radius: 6px;
+        text-align: center;
+        line-height: 32px;
+        font-size: 14px;
+        font-weight: 700;
+        margin-right: 10px;
+        vertical-align: middle;
+      }
+
+      .section h2 {
+        font-size: 26px;
+        font-weight: 800;
+        color: #0f172a;
+        margin-bottom: 24px;
+        padding-bottom: 12px;
+        border-bottom: 2px solid #e2e8f0;
+      }
+
+      .section h3 {
+        font-size: 18px;
+        font-weight: 700;
+        color: #1e293b;
+        margin: 28px 0 12px;
+      }
+
+      .section h4 {
+        font-size: 15px;
+        font-weight: 700;
+        color: #334155;
+        margin: 20px 0 8px;
+      }
+
+      .section p {
+        font-size: 14px;
+        color: #475569;
+        margin-bottom: 12px;
+        max-width: 820px;
+      }
+
+      .section ul,
+      .section ol {
+        padding-left: 24px;
+        margin-bottom: 16px;
+      }
+
+      .section li {
+        font-size: 14px;
+        color: #475569;
+        margin-bottom: 6px;
+      }
+
+      /* ─── INFO BOX ───────────────────────── */
+      .info-box {
+        background: #f0fdfa;
+        border-left: 4px solid #0f766e;
+        padding: 16px 20px;
+        border-radius: 0 8px 8px 0;
+        margin: 16px 0;
+      }
+
+      .info-box p {
+        margin: 0;
+        font-size: 13px;
+      }
+
+      .info-box strong {
+        color: #0f766e;
+      }
+
+      .warn-box {
+        background: #fffbeb;
+        border-left: 4px solid #d97706;
+        padding: 16px 20px;
+        border-radius: 0 8px 8px 0;
+        margin: 16px 0;
+      }
+
+      .warn-box p {
+        margin: 0;
+        font-size: 13px;
+        color: #92400e;
+      }
+
+      /* ─── TABLE ──────────────────────────── */
+      .srs-table-wrap {
+        overflow-x: auto;
+        margin: 16px 0;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+      }
+
+      .srs-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+      }
+
+      .srs-table thead {
+        background: #0f172a;
+        color: #fff;
+      }
+
+      .srs-table th {
+        padding: 12px 14px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .srs-table td {
+        padding: 10px 14px;
+        border-bottom: 1px solid #f1f5f9;
+        vertical-align: top;
+      }
+
+      .srs-table tbody tr:hover {
+        background: #f8fafc;
+      }
+
+      .srs-table tbody tr:nth-child(even) {
+        background: #f9fafb;
+      }
+
+      .srs-table tbody tr:nth-child(even):hover {
+        background: #f1f5f9;
+      }
+
+      /* ─── REQUIREMENT ID ─────────────────── */
+      .req-id {
+        display: inline-block;
+        background: #e0f2fe;
+        color: #0369a1;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 700;
+        font-family: 'Consolas', monospace;
+      }
+
+      .priority-high {
+        background: #fef2f2;
+        color: #dc2626;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      .priority-med {
+        background: #fffbeb;
+        color: #d97706;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      .priority-low {
+        background: #f0fdf4;
+        color: #16a34a;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      /* ─── MODULE CARD ────────────────────── */
+      .module-block {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 24px 28px;
+        margin: 20px 0;
+      }
+
+      .module-block h4 {
+        margin-top: 0;
+        font-size: 16px;
+        color: #0f172a;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .module-block h4 .m-id {
+        background: #0f766e;
+        color: #fff;
+        padding: 2px 10px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      .module-block .desc {
+        font-size: 13px;
+        color: #64748b;
+        margin: 8px 0 14px;
+      }
+
+      .func-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 13px;
+      }
+
+      .func-table th {
+        background: #e2e8f0;
+        padding: 8px 12px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 12px;
+        color: #334155;
+      }
+
+      .func-table td {
+        padding: 8px 12px;
+        border-bottom: 1px solid #e2e8f0;
+        vertical-align: top;
+      }
+
+      /* ─── FLOW DIAGRAM ───────────────────── */
+      .flow-wrap {
+        overflow-x: auto;
+        margin: 20px 0;
+      }
+
+      .flow {
+        display: flex;
+        align-items: center;
+        gap: 0;
+        min-width: 900px;
+        padding: 16px 0;
+      }
+
+      .flow-step {
+        background: #fff;
+        border: 2px solid #0f766e;
+        border-radius: 10px;
+        padding: 12px 16px;
+        text-align: center;
+        min-width: 120px;
+        flex-shrink: 0;
+      }
+
+      .flow-step .step-label {
+        font-size: 10px;
+        font-weight: 700;
+        color: #0f766e;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .flow-step .step-name {
+        font-size: 13px;
+        font-weight: 700;
+        color: #0f172a;
+        margin-top: 2px;
+      }
+
+      .flow-step .step-actor {
+        font-size: 11px;
+        color: #64748b;
+        margin-top: 2px;
+      }
+
+      .flow-arrow {
+        font-size: 20px;
+        color: #0f766e;
+        padding: 0 6px;
+        flex-shrink: 0;
+        font-weight: 700;
+      }
+
+      /* ─── ARCHITECTURE DIAGRAM ───────────── */
+      .arch-diagram {
+        background: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 10px;
+        padding: 32px;
+        margin: 20px 0;
+        text-align: center;
+      }
+
+      .arch-layer {
+        display: flex;
+        justify-content: center;
+        gap: 16px;
+        margin: 8px 0;
+        flex-wrap: wrap;
+      }
+
+      .arch-box {
+        background: #fff;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        padding: 12px 20px;
+        min-width: 140px;
+        text-align: center;
+      }
+
+      .arch-box.highlight {
+        border-color: #0f766e;
+        background: #f0fdfa;
+      }
+
+      .arch-box .box-label {
+        font-size: 11px;
+        font-weight: 700;
+        color: #64748b;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .arch-box .box-name {
+        font-size: 14px;
+        font-weight: 700;
+        color: #0f172a;
+      }
+
+      .arch-connector {
+        font-size: 18px;
+        color: #94a3b8;
+        margin: 4px 0;
+      }
+
+      .arch-label {
+        font-size: 12px;
+        font-weight: 700;
+        color: #0f766e;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin: 16px 0 8px;
+      }
+
+      /* ─── ROLE BADGE ─────────────────────── */
+      .role-badge {
+        display: inline-block;
+        padding: 2px 10px;
+        border-radius: 4px;
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      .role-sa {
+        background: #fef2f2;
+        color: #dc2626;
+      }
+      .role-admin {
+        background: #fff7ed;
+        color: #ea580c;
+      }
+      .role-doc {
+        background: #eff6ff;
+        color: #2563eb;
+      }
+      .role-tech {
+        background: #f0fdf4;
+        color: #16a34a;
+      }
+      .role-recep {
+        background: #fdf4ff;
+        color: #9333ea;
+      }
+      .role-acc {
+        background: #fefce8;
+        color: #ca8a04;
+      }
+
+      /* ─── RESPONSIVE ─────────────────────── */
+      @media (max-width: 900px) {
+        nav.sidebar {
+          display: none;
+        }
+
+        .main {
+          margin-left: 0;
+        }
+
+        .section {
+          padding: 32px 20px;
+        }
+
+        .cover {
+          padding: 60px 20px;
+        }
+
+        .cover h1 {
+          font-size: 28px;
+        }
+      }
+
+      /* ─── TOC ────────────────────────────── */
+      .toc {
+        columns: 2;
+        column-gap: 40px;
+      }
+
+      .toc li {
+        break-inside: avoid;
+      }
+
+      .toc a {
+        color: #0369a1;
+        text-decoration: none;
+      }
+
+      .toc a:hover {
+        text-decoration: underline;
+      }
+
+      /* ─── PERM TABLE COLORS ──────────────── */
+      .perm-full {
+        color: #0f766e;
+        font-weight: 700;
+      }
+      .perm-partial {
+        color: #0369a1;
+        font-weight: 600;
+      }
+      .perm-read {
+        color: #94a3b8;
+      }
+      .perm-none {
+        color: #d4d4d8;
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- ═══════════ SIDEBAR NAVIGATION ═══════════ -->
+    <nav class="sidebar no-print">
+      <div class="nav-title">
+        SRS Document
+        <small>Pathology Lab Management System</small>
+      </div>
+      <a href="#cover">Cover Page</a>
+      <a href="#toc">Table of Contents</a>
+
+      <a href="#s1" class="section-title">1. Introduction</a>
+      <a href="#s1">Purpose & Scope</a>
+
+      <a href="#s2" class="section-title">2. Overall Description</a>
+      <a href="#s2">Product Perspective</a>
+
+      <a href="#s3" class="section-title">3. System Architecture</a>
+      <a href="#s3">Tech Stack & Diagram</a>
+
+      <a href="#s4" class="section-title">4. Functional Requirements</a>
+      <a href="#m1">4.1 User & Auth</a>
+      <a href="#m2">4.2 Patient Registration</a>
+      <a href="#m3">4.3 Test Catalogue</a>
+      <a href="#m4">4.4 Order & Sample</a>
+      <a href="#m5">4.5 Result Entry</a>
+      <a href="#m6">4.6 Report Generation</a>
+      <a href="#m7">4.7 Billing</a>
+      <a href="#m8">4.8 Inventory</a>
+      <a href="#m9">4.9 Dashboard</a>
+      <a href="#m10">4.10 Audit Log</a>
+
+      <a href="#s5" class="section-title">5. User Roles & RBAC</a>
+      <a href="#s5">Roles & Permissions</a>
+
+      <a href="#s6" class="section-title">6. Workflow</a>
+      <a href="#s6">End-to-End Flow</a>
+
+      <a href="#s7" class="section-title">7. Non-Functional Reqs</a>
+      <a href="#s7-security">7.1 Security</a>
+      <a href="#s7-perf">7.2 Performance</a>
+      <a href="#s7-scale">7.3 Scalability</a>
+
+      <a href="#s8" class="section-title">8. Deployment</a>
+      <a href="#s8">Infrastructure & LB</a>
+
+      <a href="#s9" class="section-title">9. Database Design</a>
+      <a href="#s9">Entity Overview</a>
+
+      <a href="#s10" class="section-title">10. API Specification</a>
+      <a href="#s10">Endpoint Summary</a>
+
+      <a href="#s11" class="section-title">11. Acceptance Criteria</a>
+      <a href="#s11">Sign-Off & Deliverables</a>
+    </nav>
+
+    <!-- ═══════════ MAIN CONTENT ═══════════ -->
+    <div class="main">
+      <!-- ─── COVER PAGE ──────────────────── -->
+      <div class="cover" id="cover">
+        <div class="doc-badge">Confidential &mdash; Client Document</div>
+        <h1>Software Requirements Specification</h1>
+        <p class="subtitle">
+          Pathology Laboratory Information Management System (LIMS)
+        </p>
+
+        <dl class="cover-meta">
+          <dt>Document ID</dt>
+          <dd>SRS-LIMS-2026-001</dd>
+          <dt>Version</dt>
+          <dd>1.0</dd>
+          <dt>Date</dt>
+          <dd>12 February 2026</dd>
+          <dt>Status</dt>
+          <dd>Draft &mdash; Pending Approval</dd>
+          <dt>Prepared By</dt>
+          <dd>Abhishek Mishra</dd>
+
+          <dt>Product Type</dt>
+          <dd>B2B SaaS / On-Premise LIMS Platform</dd>
+          <dt>Confidentiality</dt>
+          <dd>Restricted &mdash; Do not distribute</dd>
+        </dl>
+      </div>
+
+      <!-- ─── REVISION HISTORY ────────────── -->
+      <div class="section">
+        <h2>Revision History</h2>
+        <div class="srs-table-wrap">
+          <table class="srs-table">
+            <thead>
+              <tr>
+                <th>Version</th>
+                <th>Date</th>
+                <th>Author</th>
+                <th>Changes</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1.0</td>
+                <td>12-Feb-2026</td>
+                <td>Abhishek Mishra</td>
+                <td>
+                  Initial SRS document with all functional and non-functional
+                  requirements
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ─── TABLE OF CONTENTS ───────────── -->
+      <div class="section" id="toc">
+        <h2>Table of Contents</h2>
+        <ol class="toc">
+          <li>
+            <a href="#s1">Introduction</a>
+            <ol>
+              <li><a href="#s1">Purpose</a></li>
+              <li><a href="#s1">Scope</a></li>
+              <li><a href="#s1">Definitions & Abbreviations</a></li>
+              <li><a href="#s1">References</a></li>
+            </ol>
+          </li>
+          <li>
+            <a href="#s2">Overall Description</a>
+            <ol>
+              <li><a href="#s2">Product Perspective</a></li>
+              <li><a href="#s2">Product Functions (Summary)</a></li>
+              <li><a href="#s2">User Classes & Characteristics</a></li>
+              <li><a href="#s2">Assumptions & Dependencies</a></li>
+            </ol>
+          </li>
+          <li><a href="#s3">System Architecture</a></li>
+          <li>
+            <a href="#s4">Functional Requirements</a>
+            <ol>
+              <li><a href="#m1">User Management & Authentication</a></li>
+              <li><a href="#m2">Patient Registration</a></li>
+              <li><a href="#m3">Test Catalogue Management</a></li>
+              <li><a href="#m4">Order & Sample Tracking</a></li>
+              <li><a href="#m5">Result Entry & Validation</a></li>
+              <li><a href="#m6">Report Generation & Delivery</a></li>
+              <li><a href="#m7">Billing & Payments</a></li>
+              <li><a href="#m8">Inventory & Reagent Management</a></li>
+              <li><a href="#m9">Dashboard & Analytics</a></li>
+              <li><a href="#m10">Audit Log & Activity Tracking</a></li>
+            </ol>
+          </li>
+          <li><a href="#s5">User Roles & Permissions (RBAC)</a></li>
+          <li><a href="#s6">System Workflow</a></li>
+          <li>
+            <a href="#s7">Non-Functional Requirements</a>
+            <ol>
+              <li><a href="#s7-security">Security Requirements</a></li>
+              <li><a href="#s7-perf">Performance Requirements</a></li>
+              <li><a href="#s7-scale">Scalability & Availability</a></li>
+            </ol>
+          </li>
+          <li><a href="#s8">Deployment & Infrastructure</a></li>
+          <li><a href="#s9">Database Design Overview</a></li>
+          <li><a href="#s10">API Specification Summary</a></li>
+          <li><a href="#s11">Acceptance Criteria & Sign-Off</a></li>
+        </ol>
+      </div>
+
+      <!-- ════════════════════════════════════════ -->
+      <!-- SECTION 1: INTRODUCTION                  -->
+      <!-- ════════════════════════════════════════ -->
+      <div class="section page-break" id="s1">
+        <h2><span class="section-num">1</span> Introduction</h2>
+
+        <h3>1.1 Purpose</h3>
+        <p>
+          This Software Requirements Specification (SRS) document describes the
+          complete functional and non-functional requirements for a
+          <strong
+            >Pathology Laboratory Information Management System (LIMS)</strong
+          >. This document serves as the primary agreement between the
+          development team and the client regarding what the system shall do.
+        </p>
+
+        <h3>1.2 Scope</h3>
+        <p>
+          The system is a <strong>B2B web-based platform</strong> designed for
+          pathology labs, diagnostic centres, and hospital laboratory
+          departments. It will manage the complete lifecycle of laboratory
+          operations:
+        </p>
+        <ul>
+          <li>Patient registration and record management</li>
+          <li>Test ordering, sample collection, and barcode-based tracking</li>
+          <li>
+            Result entry by technicians with doctor/pathologist validation
+          </li>
+          <li>
+            Automated report generation (PDF) and multi-channel delivery (SMS,
+            WhatsApp, Email)
+          </li>
+          <li>Billing, invoicing, and payment management (GST-compliant)</li>
+          <li>Inventory and reagent stock management</li>
+          <li>Role-based access control with 6 predefined roles</li>
+          <li>Real-time dashboard and business analytics</li>
+          <li>Complete audit trail of all system actions</li>
+        </ul>
+        <div class="info-box">
+          <p>
+            <strong>Delivery Model:</strong> The platform shall be offered as a
+            SaaS (cloud-hosted) product with optional on-premise and hybrid
+            deployment for enterprise clients.
+          </p>
+        </div>
+
+        <h3>1.3 Definitions & Abbreviations</h3>
+        <div class="srs-table-wrap">
+          <table class="srs-table">
+            <thead>
+              <tr>
+                <th>Term</th>
+                <th>Definition</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>LIMS</strong></td>
+                <td>Laboratory Information Management System</td>
+              </tr>
+              <tr>
+                <td><strong>UHID</strong></td>
+                <td>
+                  Unique Hospital Identification Number &mdash; unique ID
+                  assigned to each patient
+                </td>
+              </tr>
+              <tr>
+                <td><strong>TAT</strong></td>
+                <td>
+                  Turnaround Time &mdash; time from sample collection to report
+                  delivery
+                </td>
+              </tr>
+              <tr>
+                <td><strong>RBAC</strong></td>
+                <td>Role-Based Access Control</td>
+              </tr>
+              <tr>
+                <td><strong>NABL</strong></td>
+                <td>
+                  National Accreditation Board for Testing and Calibration
+                  Laboratories
+                </td>
+              </tr>
+              <tr>
+                <td><strong>HSN</strong></td>
+                <td>
+                  Harmonized System of Nomenclature &mdash; code used for GST
+                  invoicing
+                </td>
+              </tr>
+              <tr>
+                <td><strong>HMS/HIS</strong></td>
+                <td>
+                  Hospital Management System / Hospital Information System
+                </td>
+              </tr>
+              <tr>
+                <td><strong>JWT</strong></td>
+                <td>
+                  JSON Web Token &mdash; used for stateless API authentication
+                </td>
+              </tr>
+              <tr>
+                <td><strong>ORM</strong></td>
+                <td>Object-Relational Mapping (Prisma in this project)</td>
+              </tr>
+              <tr>
+                <td><strong>SaaS</strong></td>
+                <td>Software as a Service</td>
+              </tr>
+              <tr>
+                <td><strong>SLA</strong></td>
+                <td>Service Level Agreement</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>1.4 References</h3>
+        <ul>
+          <li>
+            IEEE 830-1998 &mdash; Recommended Practice for Software Requirements
+            Specifications
+          </li>
+          <li>NABL Accreditation Guidelines (ISO 15189)</li>
+          <li>OWASP Top 10 (2021) &mdash; Web Application Security Risks</li>
+          <li>GST Act &mdash; Invoice and HSN code requirements for India</li>
+        </ul>
+      </div>
+
+      <!-- ════════════════════════════════════════ -->
+      <!-- SECTION 2: OVERALL DESCRIPTION           -->
+      <!-- ════════════════════════════════════════ -->
+      <div class="section page-break" id="s2">
+        <h2><span class="section-num">2</span> Overall Description</h2>
+
+        <h3>2.1 Product Perspective</h3>
+        <p>
+          This is a <strong>new, self-contained product</strong> (not an
+          enhancement of an existing system). It is a web-based application
+          accessible via modern browsers on desktops, tablets, and mobile
+          devices. The system shall operate independently but provide RESTful
+          APIs for integration with external systems such as HMS/HIS, lab
+          equipment interfaces, and government reporting portals.
+        </p>
+
+        <h3>2.2 Product Functions (Summary)</h3>
+        <div class="srs-table-wrap">
+          <table class="srs-table">
+            <thead>
+              <tr>
+                <th>Module</th>
+                <th>Description</th>
+                <th>Priority</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>User Management & Auth</td>
+                <td>
+                  Registration, login, JWT auth, role assignment, password
+                  management
+                </td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+              <tr>
+                <td>Patient Registration</td>
+                <td>UHID generation, demographics, search, visit history</td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+              <tr>
+                <td>Test Catalogue</td>
+                <td>
+                  Test master data, categories, pricing, normal ranges, packages
+                </td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+              <tr>
+                <td>Order & Sample Tracking</td>
+                <td>
+                  Order creation, barcode labelling, status lifecycle,
+                  technician assignment
+                </td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+              <tr>
+                <td>Result Entry & Validation</td>
+                <td>
+                  Lab result input, abnormal flagging, doctor approval workflow
+                </td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+              <tr>
+                <td>Report Generation</td>
+                <td>
+                  Auto PDF generation, branded templates, multi-channel delivery
+                </td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+              <tr>
+                <td>Billing & Payments</td>
+                <td>
+                  Invoice, partial payments, discounts, GST, payment modes
+                </td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+              <tr>
+                <td>Inventory Management</td>
+                <td>Reagent stock, min-stock alerts, expiry tracking</td>
+                <td><span class="priority-med">MEDIUM</span></td>
+              </tr>
+              <tr>
+                <td>Dashboard & Analytics</td>
+                <td>KPIs, revenue charts, TAT monitoring, referral analysis</td>
+                <td><span class="priority-med">MEDIUM</span></td>
+              </tr>
+              <tr>
+                <td>Audit Log</td>
+                <td>Action tracking with before/after data, IP logging</td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>2.3 User Classes & Characteristics</h3>
+        <div class="srs-table-wrap">
+          <table class="srs-table">
+            <thead>
+              <tr>
+                <th>Role</th>
+                <th>User Profile</th>
+                <th>Technical Skill</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="role-badge role-sa">SUPER ADMIN</span></td>
+                <td>
+                  Lab owner or IT head. Full system control including user
+                  management and settings.
+                </td>
+                <td>Moderate</td>
+              </tr>
+              <tr>
+                <td><span class="role-badge role-admin">ADMIN</span></td>
+                <td>
+                  Lab manager. Handles daily operations, staff accounts, and
+                  data management.
+                </td>
+                <td>Moderate</td>
+              </tr>
+              <tr>
+                <td><span class="role-badge role-doc">DOCTOR</span></td>
+                <td>
+                  Pathologist. Reviews results, validates and releases reports.
+                </td>
+                <td>Basic</td>
+              </tr>
+              <tr>
+                <td>
+                  <span class="role-badge role-tech">LAB TECHNICIAN</span>
+                </td>
+                <td>
+                  Processes samples, enters test results, manages lab inventory.
+                </td>
+                <td>Basic</td>
+              </tr>
+              <tr>
+                <td><span class="role-badge role-recep">RECEPTIONIST</span></td>
+                <td>
+                  Front-desk operator. Registers patients, creates orders,
+                  collects payments.
+                </td>
+                <td>Basic</td>
+              </tr>
+              <tr>
+                <td><span class="role-badge role-acc">ACCOUNTANT</span></td>
+                <td>
+                  Finance team. Full billing access, revenue reports, refund
+                  processing.
+                </td>
+                <td>Basic</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>2.4 Assumptions & Dependencies</h3>
+        <ul>
+          <li>
+            Users have access to a modern browser (Chrome, Edge, Firefox, Safari
+            &mdash; latest 2 versions)
+          </li>
+          <li>
+            Internet connectivity is required for SaaS deployment; offline mode
+            is available only in hybrid deployment
+          </li>
+          <li>
+            SMS/WhatsApp delivery requires integration with a third-party
+            gateway (e.g., MSG91, Twilio)
+          </li>
+          <li>
+            Barcode label printing requires a compatible thermal printer
+            connected to the workstation
+          </li>
+          <li>
+            The client shall provide lab-specific branding assets (logo,
+            letterhead, signatures) for report templates
+          </li>
+          <li>
+            GST/tax configuration is specific to Indian regulatory requirements
+          </li>
+        </ul>
+      </div>
+
+      <!-- ════════════════════════════════════════ -->
+      <!-- SECTION 3: SYSTEM ARCHITECTURE           -->
+      <!-- ════════════════════════════════════════ -->
+      <div class="section page-break" id="s3">
+        <h2><span class="section-num">3</span> System Architecture</h2>
+
+        <h3>3.1 Technology Stack</h3>
+        <div class="srs-table-wrap">
+          <table class="srs-table">
+            <thead>
+              <tr>
+                <th>Layer</th>
+                <th>Technology</th>
+                <th>Purpose</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Frontend</strong></td>
+                <td>React 18+ with TypeScript, Vite, TailwindCSS</td>
+                <td>User interface &mdash; SPA with responsive design</td>
+              </tr>
+              <tr>
+                <td><strong>Backend</strong></td>
+                <td>Node.js with Express.js, TypeScript</td>
+                <td>RESTful API server, business logic</td>
+              </tr>
+              <tr>
+                <td><strong>Database</strong></td>
+                <td>PostgreSQL 16</td>
+                <td>Primary relational data store</td>
+              </tr>
+              <tr>
+                <td><strong>ORM</strong></td>
+                <td>Prisma</td>
+                <td>Database schema management and query builder</td>
+              </tr>
+              <tr>
+                <td><strong>Cache</strong></td>
+                <td>Redis</td>
+                <td>Session caching, token blacklist, rate limiting</td>
+              </tr>
+              <tr>
+                <td><strong>Authentication</strong></td>
+                <td>JWT (RS256) with Refresh Tokens</td>
+                <td>Stateless API authentication</td>
+              </tr>
+              <tr>
+                <td><strong>Validation</strong></td>
+                <td>Zod</td>
+                <td>Runtime request/response schema validation</td>
+              </tr>
+              <tr>
+                <td><strong>PDF Engine</strong></td>
+                <td>Puppeteer / PDFKit</td>
+                <td>Report PDF generation</td>
+              </tr>
+              <tr>
+                <td><strong>Load Balancer</strong></td>
+                <td>Nginx</td>
+                <td>Reverse proxy, SSL termination, load balancing</td>
+              </tr>
+              <tr>
+                <td><strong>Process Manager</strong></td>
+                <td>PM2</td>
+                <td>Node.js cluster mode, zero-downtime deployment</td>
+              </tr>
+              <tr>
+                <td><strong>Containers</strong></td>
+                <td>Docker + Docker Compose</td>
+                <td>Containerised deployment</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>3.2 Architecture Diagram</h3>
+        <div class="arch-diagram">
+          <div class="arch-label">Client Layer</div>
+          <div class="arch-layer">
+            <div class="arch-box">
+              <div class="box-label">Browser</div>
+              <div class="box-name">React SPA</div>
+            </div>
+            <div class="arch-box">
+              <div class="box-label">Mobile</div>
+              <div class="box-name">Responsive Web</div>
+            </div>
+          </div>
+          <div class="arch-connector">&#8595; HTTPS &#8595;</div>
+
+          <div class="arch-label">Gateway Layer</div>
+          <div class="arch-layer">
+            <div class="arch-box highlight">
+              <div class="box-label">Reverse Proxy</div>
+              <div class="box-name">Nginx + SSL</div>
+            </div>
+          </div>
+          <div class="arch-connector">&#8595; Load Balanced &#8595;</div>
+
+          <div class="arch-label">Application Layer (Cluster)</div>
+          <div class="arch-layer">
+            <div class="arch-box highlight">
+              <div class="box-label">Instance 1</div>
+              <div class="box-name">Node.js API</div>
+            </div>
+            <div class="arch-box highlight">
+              <div class="box-label">Instance 2</div>
+              <div class="box-name">Node.js API</div>
+            </div>
+            <div class="arch-box highlight">
+              <div class="box-label">Instance 3</div>
+              <div class="box-name">Node.js API</div>
+            </div>
+            <div class="arch-box highlight">
+              <div class="box-label">Instance 4</div>
+              <div class="box-name">Node.js API</div>
+            </div>
+          </div>
+          <div class="arch-connector">&#8595; &#8595;</div>
+
+          <div class="arch-label">Data Layer</div>
+          <div class="arch-layer">
+            <div class="arch-box">
+              <div class="box-label">Primary DB</div>
+              <div class="box-name">PostgreSQL 16</div>
+            </div>
+            <div class="arch-box">
+              <div class="box-label">Cache Store</div>
+              <div class="box-name">Redis</div>
+            </div>
+            <div class="arch-box">
+              <div class="box-label">File Storage</div>
+              <div class="box-name">S3 / Local FS</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════ -->
+      <!-- SECTION 4: FUNCTIONAL REQUIREMENTS       -->
+      <!-- ════════════════════════════════════════ -->
+      <div class="section page-break" id="s4">
+        <h2><span class="section-num">4</span> Functional Requirements</h2>
+        <p>
+          Each functional requirement is identified with a unique ID in the
+          format <code>FR-MODULE-NNN</code> along with its priority level.
+        </p>
+
+        <!-- ─── MODULE 1 ──────────────────── -->
+        <div class="module-block" id="m1">
+          <h4>
+            <span class="m-id">MOD-01</span> User Management & Authentication
+          </h4>
+          <p class="desc">
+            Handles user registration, login/logout, password management,
+            session handling, and role assignment.
+          </p>
+          <table class="func-table">
+            <thead>
+              <tr>
+                <th>Req ID</th>
+                <th>Requirement</th>
+                <th>Description</th>
+                <th>Priority</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="req-id">FR-AUTH-001</span></td>
+                <td>User Login</td>
+                <td>
+                  System shall allow users to login via email/phone and
+                  password. On success, issue a JWT access token (15 min) and a
+                  refresh token (7 days stored as httpOnly cookie).
+                </td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">FR-AUTH-002</span></td>
+                <td>Token Refresh</td>
+                <td>
+                  System shall allow token refresh using a valid refresh token.
+                  Old refresh token shall be revoked and a new pair issued
+                  (rotation).
+                </td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">FR-AUTH-003</span></td>
+                <td>Logout</td>
+                <td>
+                  System shall invalidate the refresh token on logout and clear
+                  the httpOnly cookie.
+                </td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">FR-AUTH-004</span></td>
+                <td>Forgot Password</td>
+                <td>
+                  System shall send a password reset link via email. Link shall
+                  expire in 30 minutes.
+                </td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">FR-AUTH-005</span></td>
+                <td>Account Lockout</td>
+                <td>
+                  System shall lock user account after 5 consecutive failed
+                  login attempts for 30 minutes.
+                </td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">FR-AUTH-006</span></td>
+                <td>User CRUD</td>
+                <td>
+                  Super Admin and Admin shall be able to create, view, update,
+                  and deactivate user accounts with role assignment.
+                </td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">FR-AUTH-007</span></td>
+                <td>Password Policy</td>
+                <td>
+                  Passwords shall be minimum 8 characters with at least 1
+                  uppercase, 1 number, and 1 special character.
+                </td>
+                <td><span class="priority-med">MEDIUM</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ─── MODULE 2 ──────────────────── -->
+        <div class="module-block" id="m2">
+          <h4><span class="m-id">MOD-02</span> Patient Registration</h4>
+          <p class="desc">
+            Manages patient onboarding with unique identification, demographics,
+            and visit history tracking.
+          </p>
+          <table class="func-table">
+            <thead>
+              <tr>
+                <th>Req ID</th>
+                <th>Requirement</th>
+                <th>Description</th>
+                <th>Priority</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="req-id">FR-PAT-001</span></td>
+                <td>UHID Generation</td>
+                <td>
+                  System shall auto-generate a unique UHID for every new patient
+                  upon registration.
+                </td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">FR-PAT-002</span></td>
+                <td>Patient Demographics</td>
+                <td>
+                  System shall capture: first name, last name, date of birth,
+                  gender, phone (required), email, address, blood group.
+                </td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">FR-PAT-003</span></td>
+                <td>Patient Search</td>
+                <td>
+                  System shall provide instant search by name, phone number, or
+                  UHID with autocomplete suggestions.
+                </td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">FR-PAT-004</span></td>
+                <td>Visit History</td>
+                <td>
+                  System shall display all previous orders, test results, and
+                  billing history for a patient in chronological order.
+                </td>
+                <td><span class="priority-med">MEDIUM</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">FR-PAT-005</span></td>
+                <td>Referring Doctor</td>
+                <td>
+                  System shall allow linking a referring doctor to each patient
+                  visit/order.
+                </td>
+                <td><span class="priority-med">MEDIUM</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">FR-PAT-006</span></td>
+                <td>Duplicate Detection</td>
+                <td>
+                  System shall check for duplicate patients by phone number and
+                  warn the operator before creating a new record.
+                </td>
+                <td><span class="priority-med">MEDIUM</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ─── MODULE 3 ──────────────────── -->
+        <div class="module-block" id="m3">
+          <h4><span class="m-id">MOD-03</span> Test Catalogue Management</h4>
+          <p class="desc">
+            Maintains the master list of all available laboratory tests with
+            pricing, normal ranges, sample types, and package groupings.
+          </p>
+          <table class="func-table">
+            <thead>
+              <tr>
+                <th>Req ID</th>
+                <th>Requirement</th>
+                <th>Description</th>
+                <th>Priority</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="req-id">FR-TST-001</span></td>
+                <td>Test Master CRUD</td>
+                <td>
+                  System shall allow Admin to create, update, and deactivate
+                  tests with fields: name, code, category, price, normal range,
+                  unit, method, sample type, TAT.
+                </td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">FR-TST-002</span></td>
+                <td>Test Categories</td>
+                <td>
+                  Tests shall be organised into categories (e.g., Haematology,
+                  Biochemistry, Microbiology, Serology, Histopathology).
+                </td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">FR-TST-003</span></td>
+                <td>Test Packages</td>
+                <td>
+                  System shall support creating test packages/profiles (e.g.,
+                  "Full Body Checkup" = CBC + LFT + KFT + Thyroid Panel) with
+                  combined pricing.
+                </td>
+                <td><span class="priority-med">MEDIUM</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">FR-TST-004</span></td>
+                <td>Normal Range Config</td>
+                <td>
+                  Normal ranges shall be configurable per test with support for
+                  age-wise and gender-wise variations.
+                </td>
+                <td><span class="priority-med">MEDIUM</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">FR-TST-005</span></td>
+                <td>Test Search</td>
+                <td>
+                  System shall provide searchable test selection with code or
+                  name autocomplete during order creation.
+                </td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ─── MODULE 4 ──────────────────── -->
+        <div class="module-block" id="m4">
+          <h4><span class="m-id">MOD-04</span> Order & Sample Tracking</h4>
+          <p class="desc">
+            Manages the complete lifecycle of test orders from creation through
+            sample collection to final result delivery.
+          </p>
+          <table class="func-table">
+            <thead>
+              <tr>
+                <th>Req ID</th>
+                <th>Requirement</th>
+                <th>Description</th>
+                <th>Priority</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="req-id">FR-ORD-001</span></td>
+                <td>Order Creation</td>
+                <td>
+                  System shall allow creating an order for a registered patient
+                  with one or more tests/packages. Auto-generate a unique order
+                  number.
+                </td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">FR-ORD-002</span></td>
+                <td>Order Status Lifecycle</td>
+                <td>
+                  Each order shall move through statuses: REGISTERED &rarr;
+                  SAMPLE_COLLECTED &rarr; PROCESSING &rarr; COMPLETED &rarr;
+                  DELIVERED. Status updates shall be timestamped.
+                </td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">FR-ORD-003</span></td>
+                <td>Barcode Generation</td>
+                <td>
+                  System shall generate a unique barcode for each sample and
+                  support printing on thermal printers.
+                </td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">FR-ORD-004</span></td>
+                <td>Technician Assignment</td>
+                <td>
+                  System shall allow assigning specific orders/samples to a lab
+                  technician.
+                </td>
+                <td><span class="priority-med">MEDIUM</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">FR-ORD-005</span></td>
+                <td>TAT Tracking</td>
+                <td>
+                  System shall track turnaround time per order and highlight
+                  orders that exceed the configured TAT threshold.
+                </td>
+                <td><span class="priority-med">MEDIUM</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">FR-ORD-006</span></td>
+                <td>Order Search & Filter</td>
+                <td>
+                  System shall provide search and filter by order number,
+                  patient name, status, date range, and assigned technician.
+                </td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ─── MODULE 5 ──────────────────── -->
+        <div class="module-block" id="m5">
+          <h4><span class="m-id">MOD-05</span> Result Entry & Validation</h4>
+          <p class="desc">
+            Enables lab technicians to enter test results and pathologists to
+            validate them before report release.
+          </p>
+          <table class="func-table">
+            <thead>
+              <tr>
+                <th>Req ID</th>
+                <th>Requirement</th>
+                <th>Description</th>
+                <th>Priority</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="req-id">FR-RES-001</span></td>
+                <td>Result Entry</td>
+                <td>
+                  Lab Technician shall enter results for each test in an order.
+                  Support both numeric (quantitative) and text (qualitative:
+                  Positive/Negative/Reactive) values.
+                </td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">FR-RES-002</span></td>
+                <td>Abnormal Flagging</td>
+                <td>
+                  System shall automatically flag results as abnormal (HIGH/LOW)
+                  if the value falls outside the configured normal range.
+                </td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">FR-RES-003</span></td>
+                <td>Doctor Validation</td>
+                <td>
+                  Results shall require validation/approval by a
+                  Doctor/Pathologist before the report can be generated and
+                  released.
+                </td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">FR-RES-004</span></td>
+                <td>Remarks</td>
+                <td>
+                  Technician and Doctor shall be able to add remarks/comments to
+                  individual test results.
+                </td>
+                <td><span class="priority-med">MEDIUM</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">FR-RES-005</span></td>
+                <td>Amendment History</td>
+                <td>
+                  If a result is edited after initial entry, system shall
+                  maintain a complete amendment history with old value, new
+                  value, who changed it, and when.
+                </td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ─── MODULE 6 ──────────────────── -->
+        <div class="module-block" id="m6">
+          <h4><span class="m-id">MOD-06</span> Report Generation & Delivery</h4>
+          <p class="desc">
+            Auto-generates branded PDF reports and delivers them to patients
+            through multiple channels.
+          </p>
+          <table class="func-table">
+            <thead>
+              <tr>
+                <th>Req ID</th>
+                <th>Requirement</th>
+                <th>Description</th>
+                <th>Priority</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="req-id">FR-RPT-001</span></td>
+                <td>PDF Generation</td>
+                <td>
+                  System shall auto-generate a PDF report once results are
+                  validated. Report shall include: lab logo, letterhead, patient
+                  info, test results with normal ranges, abnormal highlights,
+                  pathologist signature, and QR code.
+                </td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">FR-RPT-002</span></td>
+                <td>Branded Templates</td>
+                <td>
+                  Report templates shall be configurable per lab/branch with
+                  custom branding (logo, colours, footer text).
+                </td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">FR-RPT-003</span></td>
+                <td>SMS Delivery</td>
+                <td>
+                  System shall send an SMS to the patient's phone with a secure
+                  link to download the report.
+                </td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">FR-RPT-004</span></td>
+                <td>WhatsApp Delivery</td>
+                <td>
+                  System shall send the report PDF to the patient's WhatsApp
+                  number via a business API gateway.
+                </td>
+                <td><span class="priority-med">MEDIUM</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">FR-RPT-005</span></td>
+                <td>Email Delivery</td>
+                <td>
+                  System shall email the report PDF as an attachment to the
+                  patient's registered email address.
+                </td>
+                <td><span class="priority-med">MEDIUM</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">FR-RPT-006</span></td>
+                <td>QR Code Verification</td>
+                <td>
+                  Each report shall contain a QR code that links to a
+                  verification page confirming the report's authenticity.
+                </td>
+                <td><span class="priority-low">LOW</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">FR-RPT-007</span></td>
+                <td>Reprint / Re-deliver</td>
+                <td>
+                  Authorised users shall be able to reprint or re-send a report
+                  at any time.
+                </td>
+                <td><span class="priority-med">MEDIUM</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ─── MODULE 7 ──────────────────── -->
+        <div class="module-block" id="m7">
+          <h4><span class="m-id">MOD-07</span> Billing & Payments</h4>
+          <p class="desc">
+            Complete billing lifecycle including invoice generation, payment
+            collection, discounts, and GST compliance.
+          </p>
+          <table class="func-table">
+            <thead>
+              <tr>
+                <th>Req ID</th>
+                <th>Requirement</th>
+                <th>Description</th>
+                <th>Priority</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="req-id">FR-BIL-001</span></td>
+                <td>Invoice Generation</td>
+                <td>
+                  System shall auto-generate an invoice when an order is
+                  created. Invoice shall include: unique invoice number, test
+                  line items, total, discount, net amount, GST (if applicable),
+                  and HSN codes.
+                </td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">FR-BIL-002</span></td>
+                <td>Payment Modes</td>
+                <td>
+                  System shall support payment collection via Cash, Card, UPI,
+                  NEFT/RTGS, and Cheque.
+                </td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">FR-BIL-003</span></td>
+                <td>Partial Payments</td>
+                <td>
+                  System shall allow partial payments with balance due tracking.
+                  Payment status: PENDING &rarr; PARTIAL &rarr; PAID.
+                </td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">FR-BIL-004</span></td>
+                <td>Discounts</td>
+                <td>
+                  System shall support percentage-based and flat-amount
+                  discounts at order level. Discounts shall be logged with
+                  reason.
+                </td>
+                <td><span class="priority-med">MEDIUM</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">FR-BIL-005</span></td>
+                <td>Refunds</td>
+                <td>
+                  Authorised users (Accountant/Admin) shall be able to process
+                  full or partial refunds with reason and audit trail.
+                </td>
+                <td><span class="priority-med">MEDIUM</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">FR-BIL-006</span></td>
+                <td>Receipt Printing</td>
+                <td>
+                  System shall generate a printable payment receipt after each
+                  payment transaction.
+                </td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">FR-BIL-007</span></td>
+                <td>Revenue Reports</td>
+                <td>
+                  System shall generate daily, weekly, monthly revenue reports
+                  with filters by payment mode, branch, and date range.
+                </td>
+                <td><span class="priority-med">MEDIUM</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ─── MODULE 8 ──────────────────── -->
+        <div class="module-block" id="m8">
+          <h4>
+            <span class="m-id">MOD-08</span> Inventory & Reagent Management
+          </h4>
+          <p class="desc">
+            Tracks lab consumables, reagents, and supplies with stock level
+            alerts and expiry monitoring.
+          </p>
+          <table class="func-table">
+            <thead>
+              <tr>
+                <th>Req ID</th>
+                <th>Requirement</th>
+                <th>Description</th>
+                <th>Priority</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="req-id">FR-INV-001</span></td>
+                <td>Item Master</td>
+                <td>
+                  System shall maintain an inventory master with: item name,
+                  SKU, unit of measure, current stock, minimum stock level,
+                  supplier details.
+                </td>
+                <td><span class="priority-med">MEDIUM</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">FR-INV-002</span></td>
+                <td>Stock In/Out</td>
+                <td>
+                  System shall track stock-in (procurement) and stock-out
+                  (consumption) with date, quantity, and user who performed the
+                  action.
+                </td>
+                <td><span class="priority-med">MEDIUM</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">FR-INV-003</span></td>
+                <td>Low Stock Alerts</td>
+                <td>
+                  System shall display alerts when an item's stock falls below
+                  its configured minimum threshold.
+                </td>
+                <td><span class="priority-med">MEDIUM</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">FR-INV-004</span></td>
+                <td>Expiry Tracking</td>
+                <td>
+                  System shall track expiry dates and alert 30 days before
+                  expiry. Expired items shall be flagged in red.
+                </td>
+                <td><span class="priority-med">MEDIUM</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">FR-INV-005</span></td>
+                <td>Consumption Report</td>
+                <td>
+                  System shall generate monthly consumption reports showing
+                  usage trends per item.
+                </td>
+                <td><span class="priority-low">LOW</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ─── MODULE 9 ──────────────────── -->
+        <div class="module-block" id="m9">
+          <h4><span class="m-id">MOD-09</span> Dashboard & Analytics</h4>
+          <p class="desc">
+            Provides real-time business intelligence and key performance
+            indicators for lab management.
+          </p>
+          <table class="func-table">
+            <thead>
+              <tr>
+                <th>Req ID</th>
+                <th>Requirement</th>
+                <th>Description</th>
+                <th>Priority</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="req-id">FR-DSH-001</span></td>
+                <td>Summary KPIs</td>
+                <td>
+                  Dashboard shall show today's: total orders, total revenue,
+                  pending results, delivered reports, outstanding payments.
+                </td>
+                <td><span class="priority-med">MEDIUM</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">FR-DSH-002</span></td>
+                <td>Revenue Charts</td>
+                <td>
+                  Display daily/weekly/monthly revenue trends as line/bar charts
+                  with filter by date range and branch.
+                </td>
+                <td><span class="priority-med">MEDIUM</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">FR-DSH-003</span></td>
+                <td>Test-wise Analysis</td>
+                <td>
+                  Show top 10 most-ordered tests, revenue per test, and
+                  category-wise distribution.
+                </td>
+                <td><span class="priority-low">LOW</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">FR-DSH-004</span></td>
+                <td>Referral Analysis</td>
+                <td>
+                  Show top referring doctors by order count and revenue
+                  contribution.
+                </td>
+                <td><span class="priority-low">LOW</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">FR-DSH-005</span></td>
+                <td>TAT Monitoring</td>
+                <td>
+                  Display average turnaround time vs SLA target with breakdown
+                  by test category.
+                </td>
+                <td><span class="priority-med">MEDIUM</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">FR-DSH-006</span></td>
+                <td>Role-Based Dashboard</td>
+                <td>
+                  Each role shall see a customised dashboard relevant to their
+                  work (e.g., Technician sees pending samples, Accountant sees
+                  revenue).
+                </td>
+                <td><span class="priority-med">MEDIUM</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ─── MODULE 10 ─────────────────── -->
+        <div class="module-block" id="m10">
+          <h4>
+            <span class="m-id">MOD-10</span> Audit Log & Activity Tracking
+          </h4>
+          <p class="desc">
+            Maintains a tamper-proof log of every significant action in the
+            system for compliance and security.
+          </p>
+          <table class="func-table">
+            <thead>
+              <tr>
+                <th>Req ID</th>
+                <th>Requirement</th>
+                <th>Description</th>
+                <th>Priority</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="req-id">FR-AUD-001</span></td>
+                <td>Action Logging</td>
+                <td>
+                  System shall log every CREATE, UPDATE, and DELETE operation
+                  with: user ID, user name, action type, entity name, entity ID,
+                  timestamp, and IP address.
+                </td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">FR-AUD-002</span></td>
+                <td>Data Snapshots</td>
+                <td>
+                  For UPDATE and DELETE operations, system shall store the
+                  before (old) and after (new) data as JSON.
+                </td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">FR-AUD-003</span></td>
+                <td>Audit Log Viewer</td>
+                <td>
+                  Super Admin and Admin shall be able to view, search, and
+                  filter audit logs by user, action type, entity, and date
+                  range.
+                </td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">FR-AUD-004</span></td>
+                <td>Immutability</td>
+                <td>
+                  Audit log records shall be immutable &mdash; no user
+                  (including Super Admin) shall be able to edit or delete audit
+                  entries.
+                </td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════ -->
+      <!-- SECTION 5: USER ROLES & RBAC             -->
+      <!-- ════════════════════════════════════════ -->
+      <div class="section page-break" id="s5">
+        <h2>
+          <span class="section-num">5</span> User Roles & Permissions (RBAC)
+        </h2>
+        <p>
+          The system implements Role-Based Access Control (RBAC). Each user is
+          assigned exactly one role. Permissions are defined at the
+          <strong>module + action level</strong> (Create, Read, Update, Delete).
+          Permissions are stored in the database and can be customised by Super
+          Admin.
+        </p>
+
+        <h3>5.1 Permission Matrix</h3>
+        <div class="srs-table-wrap">
+          <table class="srs-table" style="font-size: 12px">
+            <thead>
+              <tr>
+                <th>Module</th>
+                <th><span class="role-badge role-sa">Super Admin</span></th>
+                <th><span class="role-badge role-admin">Admin</span></th>
+                <th><span class="role-badge role-doc">Doctor</span></th>
+                <th><span class="role-badge role-tech">Lab Tech</span></th>
+                <th><span class="role-badge role-recep">Receptionist</span></th>
+                <th><span class="role-badge role-acc">Accountant</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>User Management</strong></td>
+                <td class="perm-full">C R U D</td>
+                <td class="perm-partial">C R U</td>
+                <td class="perm-none">&mdash;</td>
+                <td class="perm-none">&mdash;</td>
+                <td class="perm-none">&mdash;</td>
+                <td class="perm-none">&mdash;</td>
+              </tr>
+              <tr>
+                <td><strong>Patient Records</strong></td>
+                <td class="perm-full">C R U D</td>
+                <td class="perm-full">C R U D</td>
+                <td class="perm-read">R</td>
+                <td class="perm-read">R</td>
+                <td class="perm-partial">C R U</td>
+                <td class="perm-read">R</td>
+              </tr>
+              <tr>
+                <td><strong>Test Catalogue</strong></td>
+                <td class="perm-full">C R U D</td>
+                <td class="perm-full">C R U D</td>
+                <td class="perm-read">R</td>
+                <td class="perm-read">R</td>
+                <td class="perm-read">R</td>
+                <td class="perm-read">R</td>
+              </tr>
+              <tr>
+                <td><strong>Orders</strong></td>
+                <td class="perm-full">C R U D</td>
+                <td class="perm-full">C R U D</td>
+                <td class="perm-partial">R U</td>
+                <td class="perm-partial">R U</td>
+                <td class="perm-partial">C R</td>
+                <td class="perm-read">R</td>
+              </tr>
+              <tr>
+                <td><strong>Result Entry</strong></td>
+                <td class="perm-full">C R U D</td>
+                <td class="perm-full">C R U D</td>
+                <td class="perm-read">R</td>
+                <td class="perm-partial">C R U</td>
+                <td class="perm-read">R</td>
+                <td class="perm-none">&mdash;</td>
+              </tr>
+              <tr>
+                <td><strong>Report Validation</strong></td>
+                <td class="perm-full">C R U D</td>
+                <td class="perm-full">C R U D</td>
+                <td class="perm-partial">R U (Validate)</td>
+                <td class="perm-read">R</td>
+                <td class="perm-read">R</td>
+                <td class="perm-read">R</td>
+              </tr>
+              <tr>
+                <td><strong>Billing</strong></td>
+                <td class="perm-full">C R U D</td>
+                <td class="perm-full">C R U D</td>
+                <td class="perm-read">R</td>
+                <td class="perm-none">&mdash;</td>
+                <td class="perm-partial">C R</td>
+                <td class="perm-full">C R U D</td>
+              </tr>
+              <tr>
+                <td><strong>Inventory</strong></td>
+                <td class="perm-full">C R U D</td>
+                <td class="perm-full">C R U D</td>
+                <td class="perm-none">&mdash;</td>
+                <td class="perm-partial">C R U</td>
+                <td class="perm-none">&mdash;</td>
+                <td class="perm-read">R</td>
+              </tr>
+              <tr>
+                <td><strong>Dashboard</strong></td>
+                <td class="perm-full">Full</td>
+                <td class="perm-full">Full</td>
+                <td class="perm-partial">Own Stats</td>
+                <td class="perm-partial">Own Stats</td>
+                <td class="perm-partial">Reg. Stats</td>
+                <td class="perm-partial">Revenue Stats</td>
+              </tr>
+              <tr>
+                <td><strong>Audit Logs</strong></td>
+                <td class="perm-full">R</td>
+                <td class="perm-read">R</td>
+                <td class="perm-none">&mdash;</td>
+                <td class="perm-none">&mdash;</td>
+                <td class="perm-none">&mdash;</td>
+                <td class="perm-none">&mdash;</td>
+              </tr>
+              <tr>
+                <td><strong>System Settings</strong></td>
+                <td class="perm-full">C R U D</td>
+                <td class="perm-partial">R U</td>
+                <td class="perm-none">&mdash;</td>
+                <td class="perm-none">&mdash;</td>
+                <td class="perm-none">&mdash;</td>
+                <td class="perm-none">&mdash;</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>5.2 Role Descriptions</h3>
+        <div class="srs-table-wrap">
+          <table class="srs-table">
+            <thead>
+              <tr>
+                <th>Role</th>
+                <th>Description</th>
+                <th>Typical User</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="role-badge role-sa">SUPER ADMIN</span></td>
+                <td>
+                  Full system control. Manages all modules, user accounts,
+                  roles/permissions, system settings, and audit logs. Can
+                  perform all CRUD operations across the platform.
+                </td>
+                <td>Lab Owner, IT Head</td>
+              </tr>
+              <tr>
+                <td><span class="role-badge role-admin">ADMIN</span></td>
+                <td>
+                  Operational manager. Full access to clinical and billing
+                  modules. Can create staff accounts but cannot delete system
+                  settings or audit logs.
+                </td>
+                <td>Lab Manager, Branch Head</td>
+              </tr>
+              <tr>
+                <td><span class="role-badge role-doc">DOCTOR</span></td>
+                <td>
+                  Clinical reviewer. Views patient records, orders, and results.
+                  Primary role is to
+                  <strong>validate/approve test results</strong> before report
+                  release. Signs off on final reports.
+                </td>
+                <td>Pathologist, Consultant Doctor</td>
+              </tr>
+              <tr>
+                <td>
+                  <span class="role-badge role-tech">LAB TECHNICIAN</span>
+                </td>
+                <td>
+                  Sample processor. Enters test results, updates order status,
+                  manages inventory. Cannot access billing, user management, or
+                  system settings.
+                </td>
+                <td>Lab Technician, Lab Assistant</td>
+              </tr>
+              <tr>
+                <td><span class="role-badge role-recep">RECEPTIONIST</span></td>
+                <td>
+                  Front-desk operations. Registers patients, creates orders,
+                  collects initial payments, prints receipts. Cannot modify
+                  results or access admin areas.
+                </td>
+                <td>Front-Desk Staff, Data Entry Operator</td>
+              </tr>
+              <tr>
+                <td><span class="role-badge role-acc">ACCOUNTANT</span></td>
+                <td>
+                  Financial management. Full access to billing module (invoices,
+                  payments, refunds, revenue reports). Read-only access to
+                  clinical modules for reference.
+                </td>
+                <td>Accountant, Finance Manager</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════ -->
+      <!-- SECTION 6: SYSTEM WORKFLOW               -->
+      <!-- ════════════════════════════════════════ -->
+      <div class="section page-break" id="s6">
+        <h2><span class="section-num">6</span> System Workflow</h2>
+
+        <h3>6.1 Primary Lab Workflow (End-to-End)</h3>
+        <p>
+          The following diagram shows the complete flow from patient
+          registration to report delivery, including the responsible actor at
+          each step.
+        </p>
+
+        <div class="flow-wrap">
+          <div class="flow">
+            <div class="flow-step">
+              <div class="step-label">Step 1</div>
+              <div class="step-name">Patient Registration</div>
+              <div class="step-actor">Receptionist</div>
+            </div>
+            <div class="flow-arrow">&rarr;</div>
+            <div class="flow-step">
+              <div class="step-label">Step 2</div>
+              <div class="step-name">Test Order + Invoice</div>
+              <div class="step-actor">Receptionist</div>
+            </div>
+            <div class="flow-arrow">&rarr;</div>
+            <div class="flow-step">
+              <div class="step-label">Step 3</div>
+              <div class="step-name">Sample Collection</div>
+              <div class="step-actor">Technician</div>
+            </div>
+            <div class="flow-arrow">&rarr;</div>
+            <div class="flow-step">
+              <div class="step-label">Step 4</div>
+              <div class="step-name">Lab Processing</div>
+              <div class="step-actor">Technician</div>
+            </div>
+            <div class="flow-arrow">&rarr;</div>
+            <div class="flow-step">
+              <div class="step-label">Step 5</div>
+              <div class="step-name">Result Entry</div>
+              <div class="step-actor">Technician</div>
+            </div>
+            <div class="flow-arrow">&rarr;</div>
+            <div class="flow-step">
+              <div class="step-label">Step 6</div>
+              <div class="step-name">Doctor Validation</div>
+              <div class="step-actor">Pathologist</div>
+            </div>
+            <div class="flow-arrow">&rarr;</div>
+            <div class="flow-step">
+              <div class="step-label">Step 7</div>
+              <div class="step-name">Report Delivery</div>
+              <div class="step-actor">System (Auto)</div>
+            </div>
+          </div>
+        </div>
+
+        <h3>6.2 Workflow Step Details</h3>
+        <div class="srs-table-wrap">
+          <table class="srs-table">
+            <thead>
+              <tr>
+                <th>Step</th>
+                <th>Action</th>
+                <th>Actor</th>
+                <th>System Behaviour</th>
+                <th>Order Status After</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>Register Patient</td>
+                <td>Receptionist</td>
+                <td>
+                  Create patient record, generate UHID, check for duplicates
+                </td>
+                <td>&mdash;</td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>Create Test Order</td>
+                <td>Receptionist</td>
+                <td>
+                  Select tests, apply discounts, generate invoice, collect
+                  payment
+                </td>
+                <td>REGISTERED</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>Collect Sample</td>
+                <td>Technician</td>
+                <td>
+                  Print barcode label, attach to sample tube, mark as collected
+                </td>
+                <td>SAMPLE_COLLECTED</td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td>Process Sample</td>
+                <td>Technician</td>
+                <td>Run tests on lab equipment, mark as processing</td>
+                <td>PROCESSING</td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td>Enter Results</td>
+                <td>Technician</td>
+                <td>Enter values per test, system auto-flags abnormals</td>
+                <td>PROCESSING</td>
+              </tr>
+              <tr>
+                <td>6</td>
+                <td>Validate Results</td>
+                <td>Doctor</td>
+                <td>Review results + abnormals, approve or request re-test</td>
+                <td>COMPLETED</td>
+              </tr>
+              <tr>
+                <td>7</td>
+                <td>Deliver Report</td>
+                <td>System</td>
+                <td>Auto-generate PDF, send via SMS/WhatsApp/Email</td>
+                <td>DELIVERED</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>6.3 Authentication Flow</h3>
+        <div class="flow-wrap">
+          <div class="flow">
+            <div class="flow-step">
+              <div class="step-label">Step 1</div>
+              <div class="step-name">Login</div>
+              <div class="step-actor">Email + Password</div>
+            </div>
+            <div class="flow-arrow">&rarr;</div>
+            <div class="flow-step">
+              <div class="step-label">Step 2</div>
+              <div class="step-name">Validate Credentials</div>
+              <div class="step-actor">bcrypt compare</div>
+            </div>
+            <div class="flow-arrow">&rarr;</div>
+            <div class="flow-step">
+              <div class="step-label">Step 3</div>
+              <div class="step-name">Issue Tokens</div>
+              <div class="step-actor">Access (15m) + Refresh (7d)</div>
+            </div>
+            <div class="flow-arrow">&rarr;</div>
+            <div class="flow-step">
+              <div class="step-label">Step 4</div>
+              <div class="step-name">API Request</div>
+              <div class="step-actor">Bearer Token in Header</div>
+            </div>
+            <div class="flow-arrow">&rarr;</div>
+            <div class="flow-step">
+              <div class="step-label">Step 5</div>
+              <div class="step-name">Permission Check</div>
+              <div class="step-actor">RBAC Middleware</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════ -->
+      <!-- SECTION 7: NON-FUNCTIONAL REQUIREMENTS   -->
+      <!-- ════════════════════════════════════════ -->
+      <div class="section page-break" id="s7">
+        <h2><span class="section-num">7</span> Non-Functional Requirements</h2>
+
+        <h3 id="s7-security">7.1 Security Requirements</h3>
+        <div class="srs-table-wrap">
+          <table class="srs-table">
+            <thead>
+              <tr>
+                <th>Req ID</th>
+                <th>Requirement</th>
+                <th>Description</th>
+                <th>Priority</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="req-id">NFR-SEC-001</span></td>
+                <td>HTTPS Encryption</td>
+                <td>
+                  All client-server communication shall be encrypted using TLS
+                  1.2+ (preferably TLS 1.3). HTTP requests shall be redirected
+                  to HTTPS. HSTS headers shall be enforced.
+                </td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">NFR-SEC-002</span></td>
+                <td>Password Hashing</td>
+                <td>
+                  All passwords shall be hashed using bcrypt with a minimum of
+                  12 salt rounds. Plaintext passwords shall never be stored or
+                  logged.
+                </td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">NFR-SEC-003</span></td>
+                <td>JWT Security</td>
+                <td>
+                  Access tokens shall be signed using RS256 (asymmetric).
+                  Refresh tokens shall be stored in httpOnly, Secure,
+                  SameSite=Strict cookies. Token rotation on every refresh.
+                </td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">NFR-SEC-004</span></td>
+                <td>SQL Injection Prevention</td>
+                <td>
+                  All database queries shall use parameterised queries via the
+                  ORM. No raw SQL shall be used unless explicitly parameterised.
+                </td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">NFR-SEC-005</span></td>
+                <td>XSS Prevention</td>
+                <td>
+                  Content-Security-Policy headers shall be set via Helmet.js.
+                  All user inputs shall be sanitised. React's default escaping
+                  shall be relied upon for output encoding.
+                </td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">NFR-SEC-006</span></td>
+                <td>CORS Policy</td>
+                <td>
+                  CORS shall be configured to allow requests only from the
+                  whitelisted frontend domain(s). Credentials shall be allowed
+                  only for the configured origin.
+                </td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">NFR-SEC-007</span></td>
+                <td>Rate Limiting</td>
+                <td>
+                  API rate limiting: 100 requests per 15 minutes for general
+                  endpoints. 10 requests per 15 minutes for authentication
+                  endpoints.
+                </td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">NFR-SEC-008</span></td>
+                <td>Input Validation</td>
+                <td>
+                  All API request payloads shall be validated against Zod
+                  schemas. Invalid requests shall return 400 Bad Request with
+                  descriptive error messages.
+                </td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">NFR-SEC-009</span></td>
+                <td>Audit Trail</td>
+                <td>
+                  Every CUD (Create, Update, Delete) operation shall be logged
+                  with user identity, timestamp, IP address, and data diff (as
+                  defined in MOD-10).
+                </td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+              <tr>
+                <td><span class="req-id">NFR-SEC-010</span></td>
+                <td>Data Backup</td>
+                <td>
+                  Automated daily database backups with 30-day retention.
+                  Point-in-time recovery capability. Backups shall be encrypted
+                  at rest.
+                </td>
+                <td><span class="priority-high">HIGH</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 id="s7-perf">7.2 Performance Requirements</h3>
+        <div class="srs-table-wrap">
+          <table class="srs-table">
+            <thead>
+              <tr>
+                <th>Req ID</th>
+                <th>Metric</th>
+                <th>Target</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="req-id">NFR-PER-001</span></td>
+                <td>API Response Time (p95)</td>
+                <td>
+                  &le; 200ms for read operations, &le; 500ms for write
+                  operations
+                </td>
+              </tr>
+              <tr>
+                <td><span class="req-id">NFR-PER-002</span></td>
+                <td>Page Load Time</td>
+                <td>
+                  &le; 2 seconds for initial load, &le; 500ms for subsequent
+                  navigation (SPA)
+                </td>
+              </tr>
+              <tr>
+                <td><span class="req-id">NFR-PER-003</span></td>
+                <td>PDF Report Generation</td>
+                <td>&le; 3 seconds per report</td>
+              </tr>
+              <tr>
+                <td><span class="req-id">NFR-PER-004</span></td>
+                <td>Search Response</td>
+                <td>
+                  &le; 300ms for patient and test search with autocomplete
+                </td>
+              </tr>
+              <tr>
+                <td><span class="req-id">NFR-PER-005</span></td>
+                <td>Concurrent Users</td>
+                <td>
+                  System shall support 100+ concurrent users without performance
+                  degradation
+                </td>
+              </tr>
+              <tr>
+                <td><span class="req-id">NFR-PER-006</span></td>
+                <td>Database Query Time</td>
+                <td>
+                  &le; 50ms for indexed queries, &le; 200ms for complex
+                  aggregation queries
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3 id="s7-scale">7.3 Scalability & Availability</h3>
+        <div class="srs-table-wrap">
+          <table class="srs-table">
+            <thead>
+              <tr>
+                <th>Req ID</th>
+                <th>Requirement</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><span class="req-id">NFR-AVL-001</span></td>
+                <td>Uptime SLA</td>
+                <td>
+                  99.9% uptime (max ~8.7 hours downtime per year) for SaaS
+                  deployment
+                </td>
+              </tr>
+              <tr>
+                <td><span class="req-id">NFR-AVL-002</span></td>
+                <td>Horizontal Scaling</td>
+                <td>
+                  Application layer shall support horizontal scaling via Node.js
+                  cluster mode (PM2) or container orchestration (Docker)
+                </td>
+              </tr>
+              <tr>
+                <td><span class="req-id">NFR-AVL-003</span></td>
+                <td>Load Balancing</td>
+                <td>
+                  Nginx shall distribute traffic across multiple Node.js
+                  instances using least-connection algorithm with health checks
+                </td>
+              </tr>
+              <tr>
+                <td><span class="req-id">NFR-AVL-004</span></td>
+                <td>Zero-Downtime Deployment</td>
+                <td>
+                  Application updates shall be deployed without service
+                  interruption using PM2 reload or rolling Docker updates
+                </td>
+              </tr>
+              <tr>
+                <td><span class="req-id">NFR-AVL-005</span></td>
+                <td>Database Scaling</td>
+                <td>
+                  PostgreSQL shall support read replicas for scaling read-heavy
+                  operations (dashboard, reports)
+                </td>
+              </tr>
+              <tr>
+                <td><span class="req-id">NFR-AVL-006</span></td>
+                <td>Data Retention</td>
+                <td>
+                  Patient records and audit logs shall be retained for minimum 7
+                  years as per regulatory requirements
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════ -->
+      <!-- SECTION 8: DEPLOYMENT                    -->
+      <!-- ════════════════════════════════════════ -->
+      <div class="section page-break" id="s8">
+        <h2><span class="section-num">8</span> Deployment & Infrastructure</h2>
+
+        <h3>8.1 Deployment Models</h3>
+        <div class="srs-table-wrap">
+          <table class="srs-table">
+            <thead>
+              <tr>
+                <th>Model</th>
+                <th>Description</th>
+                <th>Target Client</th>
+                <th>Infrastructure</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Cloud SaaS</strong></td>
+                <td>
+                  Fully managed by the vendor. Multi-tenant architecture. Client
+                  accesses via browser.
+                </td>
+                <td>Small to medium labs, single-branch operations</td>
+                <td>
+                  AWS / Azure / GCP, managed PostgreSQL, Nginx LB, CDN,
+                  auto-scaling
+                </td>
+              </tr>
+              <tr>
+                <td><strong>On-Premise</strong></td>
+                <td>
+                  Deployed on client's own servers. Full data sovereignty.
+                  Single-tenant.
+                </td>
+                <td>
+                  Hospital labs, enterprise clients with compliance requirements
+                </td>
+                <td>
+                  Docker Compose, PM2 cluster (4 workers), local PostgreSQL,
+                  Nginx, Redis
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Hybrid</strong></td>
+                <td>
+                  Central cloud + local edge nodes at branches. Data syncs in
+                  real-time.
+                </td>
+                <td>Multi-branch diagnostic chains (5+ locations)</td>
+                <td>
+                  Cloud central + Docker per branch, sync via API,
+                  offline-capable
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>8.2 Load Balancing Architecture</h3>
+        <p>
+          The production deployment shall use the following load balancing
+          configuration:
+        </p>
+        <ul>
+          <li>
+            <strong>Nginx</strong> acts as the reverse proxy and load balancer
+            at the gateway layer
+          </li>
+          <li>
+            Traffic distribution uses the
+            <strong>least-connection</strong> algorithm for even load
+            distribution
+          </li>
+          <li>
+            <strong>Health checks</strong> ensure requests are only routed to
+            healthy Node.js instances
+          </li>
+          <li>
+            <strong>SSL termination</strong> happens at Nginx &mdash; backend
+            instances communicate over HTTP internally
+          </li>
+          <li>
+            <strong>PM2 cluster mode</strong> spawns 4 Node.js worker processes
+            (configurable per CPU cores)
+          </li>
+          <li>
+            <strong>Static assets</strong> (React build output) are served
+            directly by Nginx with cache headers
+          </li>
+          <li>
+            <strong>API requests</strong> (/api/*) are proxied to the Node.js
+            cluster
+          </li>
+        </ul>
+
+        <h3>8.3 Infrastructure Components</h3>
+        <div class="srs-table-wrap">
+          <table class="srs-table">
+            <thead>
+              <tr>
+                <th>Component</th>
+                <th>Technology</th>
+                <th>Configuration</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Web Server / LB</td>
+                <td>Nginx</td>
+                <td>
+                  Reverse proxy, SSL, gzip, rate limiting, static file serving
+                </td>
+              </tr>
+              <tr>
+                <td>Application Server</td>
+                <td>Node.js + PM2</td>
+                <td>
+                  4 instances in cluster mode, max 512MB per instance,
+                  auto-restart
+                </td>
+              </tr>
+              <tr>
+                <td>Database</td>
+                <td>PostgreSQL 16</td>
+                <td>
+                  Primary instance + daily backup, connection pooling via Prisma
+                </td>
+              </tr>
+              <tr>
+                <td>Cache</td>
+                <td>Redis</td>
+                <td>Session cache, token blacklist, rate limiter backend</td>
+              </tr>
+              <tr>
+                <td>File Storage</td>
+                <td>S3 (cloud) / Local FS</td>
+                <td>Report PDFs, lab logo images, barcode images</td>
+              </tr>
+              <tr>
+                <td>Container Runtime</td>
+                <td>Docker + Compose</td>
+                <td>All services containerised for consistent deployment</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════ -->
+      <!-- SECTION 9: DATABASE DESIGN               -->
+      <!-- ════════════════════════════════════════ -->
+      <div class="section page-break" id="s9">
+        <h2><span class="section-num">9</span> Database Design Overview</h2>
+        <p>
+          The system uses PostgreSQL as the primary database with Prisma ORM for
+          schema management and migrations. Below is a summary of the core
+          entities.
+        </p>
+
+        <h3>9.1 Entity Summary</h3>
+        <div class="srs-table-wrap">
+          <table class="srs-table">
+            <thead>
+              <tr>
+                <th>Entity</th>
+                <th>Description</th>
+                <th>Key Fields</th>
+                <th>Relationships</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>Role</strong></td>
+                <td>User role definition</td>
+                <td>id, name, description</td>
+                <td>Has many Users, has many Permissions</td>
+              </tr>
+              <tr>
+                <td><strong>Permission</strong></td>
+                <td>Module + action permission</td>
+                <td>id, module, action, roleId</td>
+                <td>Belongs to Role</td>
+              </tr>
+              <tr>
+                <td><strong>User</strong></td>
+                <td>System user account</td>
+                <td>
+                  id, email, phone, passwordHash, firstName, lastName, roleId,
+                  isActive
+                </td>
+                <td>
+                  Belongs to Role, has many RefreshTokens, has many AuditLogs
+                </td>
+              </tr>
+              <tr>
+                <td><strong>RefreshToken</strong></td>
+                <td>JWT refresh token store</td>
+                <td>id, token, userId, expiresAt</td>
+                <td>Belongs to User</td>
+              </tr>
+              <tr>
+                <td><strong>Patient</strong></td>
+                <td>Patient demographic record</td>
+                <td>
+                  id, uhid, firstName, lastName, dob, gender, phone, email,
+                  bloodGroup
+                </td>
+                <td>Has many Orders</td>
+              </tr>
+              <tr>
+                <td><strong>TestCategory</strong></td>
+                <td>Test grouping category</td>
+                <td>id, name</td>
+                <td>Has many Tests</td>
+              </tr>
+              <tr>
+                <td><strong>Test</strong></td>
+                <td>Individual test definition</td>
+                <td>
+                  id, name, code, price, normalRange, unit, method, sampleType,
+                  TAT
+                </td>
+                <td>Belongs to TestCategory, has many OrderItems</td>
+              </tr>
+              <tr>
+                <td><strong>Order</strong></td>
+                <td>Patient test order</td>
+                <td>id, orderNumber, patientId, status, referredBy</td>
+                <td>
+                  Belongs to Patient, has many OrderItems, has one Billing
+                </td>
+              </tr>
+              <tr>
+                <td><strong>OrderItem</strong></td>
+                <td>Individual test in an order</td>
+                <td>
+                  id, orderId, testId, result, isAbnormal, remarks, completedAt
+                </td>
+                <td>Belongs to Order, belongs to Test</td>
+              </tr>
+              <tr>
+                <td><strong>Billing</strong></td>
+                <td>Invoice and payment record</td>
+                <td>
+                  id, invoiceNumber, orderId, totalAmount, discount, netAmount,
+                  paidAmount, paymentStatus, paymentMode
+                </td>
+                <td>Belongs to Order</td>
+              </tr>
+              <tr>
+                <td><strong>InventoryItem</strong></td>
+                <td>Lab consumable/reagent</td>
+                <td>id, name, sku, quantity, minStock, unit, expiryDate</td>
+                <td>Standalone entity</td>
+              </tr>
+              <tr>
+                <td><strong>AuditLog</strong></td>
+                <td>System action log</td>
+                <td>
+                  id, userId, action, entity, entityId, oldData, newData,
+                  ipAddress
+                </td>
+                <td>Belongs to User</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="info-box">
+          <p>
+            <strong>Note:</strong> All entities use UUID as primary key.
+            Timestamps (createdAt, updatedAt) are auto-managed by Prisma.
+            Soft-delete is implemented via an <code>isActive</code> flag where
+            applicable rather than permanent deletion.
+          </p>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════ -->
+      <!-- SECTION 10: API SPECIFICATION            -->
+      <!-- ════════════════════════════════════════ -->
+      <div class="section page-break" id="s10">
+        <h2><span class="section-num">10</span> API Specification Summary</h2>
+        <p>
+          All APIs follow RESTful conventions with JSON request/response bodies.
+          Base URL: <code>/api/v1</code>
+        </p>
+
+        <h3>10.1 API Endpoint Summary</h3>
+        <div class="srs-table-wrap">
+          <table class="srs-table">
+            <thead>
+              <tr>
+                <th>Method</th>
+                <th>Endpoint</th>
+                <th>Auth Required</th>
+                <th>Permission</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><strong>POST</strong></td>
+                <td>/api/v1/auth/login</td>
+                <td>No</td>
+                <td>&mdash;</td>
+                <td>User login, returns access + refresh token</td>
+              </tr>
+              <tr>
+                <td><strong>POST</strong></td>
+                <td>/api/v1/auth/refresh</td>
+                <td>Cookie</td>
+                <td>&mdash;</td>
+                <td>Refresh access token</td>
+              </tr>
+              <tr>
+                <td><strong>POST</strong></td>
+                <td>/api/v1/auth/logout</td>
+                <td>Yes</td>
+                <td>&mdash;</td>
+                <td>Invalidate session</td>
+              </tr>
+              <tr>
+                <td><strong>POST</strong></td>
+                <td>/api/v1/auth/forgot-password</td>
+                <td>No</td>
+                <td>&mdash;</td>
+                <td>Send reset link</td>
+              </tr>
+              <tr style="background: #f0fdfa">
+                <td colspan="5" style="font-weight: 700; color: #0f766e">
+                  User Management
+                </td>
+              </tr>
+              <tr>
+                <td><strong>GET</strong></td>
+                <td>/api/v1/users</td>
+                <td>Yes</td>
+                <td>users:read</td>
+                <td>List all users (paginated)</td>
+              </tr>
+              <tr>
+                <td><strong>POST</strong></td>
+                <td>/api/v1/users</td>
+                <td>Yes</td>
+                <td>users:create</td>
+                <td>Create new user</td>
+              </tr>
+              <tr>
+                <td><strong>PATCH</strong></td>
+                <td>/api/v1/users/:id</td>
+                <td>Yes</td>
+                <td>users:update</td>
+                <td>Update user details</td>
+              </tr>
+              <tr style="background: #f0fdfa">
+                <td colspan="5" style="font-weight: 700; color: #0f766e">
+                  Patients
+                </td>
+              </tr>
+              <tr>
+                <td><strong>GET</strong></td>
+                <td>/api/v1/patients</td>
+                <td>Yes</td>
+                <td>patients:read</td>
+                <td>List/search patients</td>
+              </tr>
+              <tr>
+                <td><strong>POST</strong></td>
+                <td>/api/v1/patients</td>
+                <td>Yes</td>
+                <td>patients:create</td>
+                <td>Register new patient</td>
+              </tr>
+              <tr>
+                <td><strong>GET</strong></td>
+                <td>/api/v1/patients/:id</td>
+                <td>Yes</td>
+                <td>patients:read</td>
+                <td>Patient details + history</td>
+              </tr>
+              <tr>
+                <td><strong>PATCH</strong></td>
+                <td>/api/v1/patients/:id</td>
+                <td>Yes</td>
+                <td>patients:update</td>
+                <td>Update patient info</td>
+              </tr>
+              <tr style="background: #f0fdfa">
+                <td colspan="5" style="font-weight: 700; color: #0f766e">
+                  Tests & Catalogue
+                </td>
+              </tr>
+              <tr>
+                <td><strong>GET</strong></td>
+                <td>/api/v1/tests</td>
+                <td>Yes</td>
+                <td>tests:read</td>
+                <td>List all tests (with category filter)</td>
+              </tr>
+              <tr>
+                <td><strong>POST</strong></td>
+                <td>/api/v1/tests</td>
+                <td>Yes</td>
+                <td>tests:create</td>
+                <td>Create new test</td>
+              </tr>
+              <tr>
+                <td><strong>PATCH</strong></td>
+                <td>/api/v1/tests/:id</td>
+                <td>Yes</td>
+                <td>tests:update</td>
+                <td>Update test details</td>
+              </tr>
+              <tr style="background: #f0fdfa">
+                <td colspan="5" style="font-weight: 700; color: #0f766e">
+                  Orders
+                </td>
+              </tr>
+              <tr>
+                <td><strong>GET</strong></td>
+                <td>/api/v1/orders</td>
+                <td>Yes</td>
+                <td>orders:read</td>
+                <td>List orders (filterable)</td>
+              </tr>
+              <tr>
+                <td><strong>POST</strong></td>
+                <td>/api/v1/orders</td>
+                <td>Yes</td>
+                <td>orders:create</td>
+                <td>Create test order</td>
+              </tr>
+              <tr>
+                <td><strong>PATCH</strong></td>
+                <td>/api/v1/orders/:id/status</td>
+                <td>Yes</td>
+                <td>orders:update</td>
+                <td>Update order status</td>
+              </tr>
+              <tr>
+                <td><strong>POST</strong></td>
+                <td>/api/v1/orders/:id/results</td>
+                <td>Yes</td>
+                <td>results:create</td>
+                <td>Enter test results</td>
+              </tr>
+              <tr>
+                <td><strong>POST</strong></td>
+                <td>/api/v1/orders/:id/validate</td>
+                <td>Yes</td>
+                <td>reports:update</td>
+                <td>Doctor validates results</td>
+              </tr>
+              <tr style="background: #f0fdfa">
+                <td colspan="5" style="font-weight: 700; color: #0f766e">
+                  Reports
+                </td>
+              </tr>
+              <tr>
+                <td><strong>GET</strong></td>
+                <td>/api/v1/reports/:orderId/pdf</td>
+                <td>Yes</td>
+                <td>reports:read</td>
+                <td>Download report PDF</td>
+              </tr>
+              <tr>
+                <td><strong>POST</strong></td>
+                <td>/api/v1/reports/:orderId/deliver</td>
+                <td>Yes</td>
+                <td>reports:update</td>
+                <td>Send report via SMS/WhatsApp/Email</td>
+              </tr>
+              <tr style="background: #f0fdfa">
+                <td colspan="5" style="font-weight: 700; color: #0f766e">
+                  Billing
+                </td>
+              </tr>
+              <tr>
+                <td><strong>GET</strong></td>
+                <td>/api/v1/billing</td>
+                <td>Yes</td>
+                <td>billing:read</td>
+                <td>List invoices</td>
+              </tr>
+              <tr>
+                <td><strong>POST</strong></td>
+                <td>/api/v1/billing/:id/payment</td>
+                <td>Yes</td>
+                <td>billing:create</td>
+                <td>Record payment</td>
+              </tr>
+              <tr>
+                <td><strong>POST</strong></td>
+                <td>/api/v1/billing/:id/refund</td>
+                <td>Yes</td>
+                <td>billing:update</td>
+                <td>Process refund</td>
+              </tr>
+              <tr style="background: #f0fdfa">
+                <td colspan="5" style="font-weight: 700; color: #0f766e">
+                  Inventory
+                </td>
+              </tr>
+              <tr>
+                <td><strong>GET</strong></td>
+                <td>/api/v1/inventory</td>
+                <td>Yes</td>
+                <td>inventory:read</td>
+                <td>List inventory items</td>
+              </tr>
+              <tr>
+                <td><strong>POST</strong></td>
+                <td>/api/v1/inventory</td>
+                <td>Yes</td>
+                <td>inventory:create</td>
+                <td>Add new item</td>
+              </tr>
+              <tr>
+                <td><strong>PATCH</strong></td>
+                <td>/api/v1/inventory/:id/stock</td>
+                <td>Yes</td>
+                <td>inventory:update</td>
+                <td>Update stock (in/out)</td>
+              </tr>
+              <tr style="background: #f0fdfa">
+                <td colspan="5" style="font-weight: 700; color: #0f766e">
+                  Dashboard & Audit
+                </td>
+              </tr>
+              <tr>
+                <td><strong>GET</strong></td>
+                <td>/api/v1/dashboard/stats</td>
+                <td>Yes</td>
+                <td>dashboard:read</td>
+                <td>Get KPI summary</td>
+              </tr>
+              <tr>
+                <td><strong>GET</strong></td>
+                <td>/api/v1/dashboard/revenue</td>
+                <td>Yes</td>
+                <td>dashboard:read</td>
+                <td>Revenue chart data</td>
+              </tr>
+              <tr>
+                <td><strong>GET</strong></td>
+                <td>/api/v1/audit-logs</td>
+                <td>Yes</td>
+                <td>audit:read</td>
+                <td>View audit trail</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>10.2 API Standards</h3>
+        <ul>
+          <li>
+            <strong>Authentication:</strong> Bearer token in Authorization
+            header for all protected endpoints
+          </li>
+          <li>
+            <strong>Pagination:</strong> All list endpoints support
+            <code>?page=1&limit=20</code> query parameters
+          </li>
+          <li>
+            <strong>Sorting:</strong> <code>?sortBy=createdAt&order=desc</code>
+          </li>
+          <li>
+            <strong>Filtering:</strong> Module-specific query parameters (e.g.,
+            <code>?status=PROCESSING&dateFrom=2026-01-01</code>)
+          </li>
+          <li>
+            <strong>Error Format:</strong>
+            <code>{ "success": false, "message": "...", "errors": [...] }</code>
+          </li>
+          <li>
+            <strong>Success Format:</strong>
+            <code
+              >{ "success": true, "data": {...}, "meta": { "page": 1, "total":
+              50 } }</code
+            >
+          </li>
+        </ul>
+      </div>
+
+      <!-- ════════════════════════════════════════ -->
+      <!-- SECTION 11: ACCEPTANCE & SIGN-OFF        -->
+      <!-- ════════════════════════════════════════ -->
+      <div class="section page-break" id="s11">
+        <h2>
+          <span class="section-num">11</span> Acceptance Criteria & Sign-Off
+        </h2>
+
+        <h3>11.1 Deliverables</h3>
+        <div class="srs-table-wrap">
+          <table class="srs-table">
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Deliverable</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>1</td>
+                <td>Source Code</td>
+                <td>
+                  Complete frontend (React) and backend (Node.js) source code in
+                  a Git repository
+                </td>
+              </tr>
+              <tr>
+                <td>2</td>
+                <td>Database Schema</td>
+                <td>Prisma schema file with all migrations</td>
+              </tr>
+              <tr>
+                <td>3</td>
+                <td>API Documentation</td>
+                <td>Swagger/OpenAPI specification for all endpoints</td>
+              </tr>
+              <tr>
+                <td>4</td>
+                <td>Deployment Package</td>
+                <td>
+                  Docker Compose files, Nginx configs, PM2 ecosystem config
+                </td>
+              </tr>
+              <tr>
+                <td>5</td>
+                <td>User Manual</td>
+                <td>End-user documentation for each role</td>
+              </tr>
+              <tr>
+                <td>6</td>
+                <td>Admin Guide</td>
+                <td>System administration and configuration guide</td>
+              </tr>
+              <tr>
+                <td>7</td>
+                <td>Test Reports</td>
+                <td>
+                  Unit test and integration test results with coverage report
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <h3>11.2 Acceptance Criteria</h3>
+        <ul>
+          <li>
+            All functional requirements marked as HIGH priority shall be fully
+            implemented and tested
+          </li>
+          <li>
+            All 6 user roles shall be functional with correct permission
+            enforcement
+          </li>
+          <li>
+            The complete lab workflow (Registration &rarr; Order &rarr; Sample
+            &rarr; Result &rarr; Validation &rarr; Report) shall work end-to-end
+          </li>
+          <li>PDF report generation shall complete within 3 seconds</li>
+          <li>
+            API response times shall meet the targets defined in Section 7.2
+          </li>
+          <li>
+            All security requirements (Section 7.1) shall be implemented and
+            verified
+          </li>
+          <li>
+            The system shall be deployed and accessible on the agreed deployment
+            model
+          </li>
+          <li>No critical or high-severity bugs at the time of delivery</li>
+        </ul>
+
+        <h3>11.3 Sign-Off</h3>
+        <div class="srs-table-wrap">
+          <table class="srs-table">
+            <thead>
+              <tr>
+                <th>Role</th>
+                <th>Name</th>
+                <th>Signature</th>
+                <th>Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Client Representative</td>
+                <td style="min-width: 200px"></td>
+                <td style="min-width: 200px"></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>Project Manager</td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>Technical Lead</td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+              <tr>
+                <td>QA Lead</td>
+                <td></td>
+                <td></td>
+                <td></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="warn-box" style="margin-top: 24px">
+          <p>
+            <strong>Disclaimer:</strong> This document constitutes the agreed
+            scope of work. Any changes to the requirements after sign-off shall
+            be handled through a formal Change Request (CR) process with impact
+            analysis on timeline and cost.
+          </p>
+        </div>
+      </div>
+
+      <!-- ─── FOOTER ──────────────────────── -->
+      <div
+        style="
+          background: #0f172a;
+          color: #64748b;
+          padding: 24px 56px;
+          font-size: 12px;
+          text-align: center;
+        "
+      >
+        <p>SRS-LIMS-2026-001 &bull; Version 1.0 &bull; Confidential</p>
+        <p style="margin-top: 4px">
+          Pathology Laboratory Information Management System &mdash; Software
+          Requirements Specification
+        </p>
+      </div>
+    </div>
+    <!-- end .main -->
+  </body>
+</html>
